@@ -137,9 +137,17 @@ function App() {
                         Text to Speech
                     </Typography>
                 </Toolbar>
-            </AppBar>
+            </AppBar>        
             <Container sx={{ display: 'flex', marginTop: '20px' }}>
                 <Container sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', marginTop: '20px' }}>
+                  <Container item xs={12}>                    
+                      {speech && (
+                        <audio controls autoPlay name="media" style={{ width: '100%', marginTop: '20px' }}>
+                          <source src={speech} type="audio/wav" />
+                            Your browser does not support the audio element.
+                        </audio>
+                      )}
+                  </Container>
                     <div style={{
                         fontSize: '.875rem',
                         fontWeight: 'bold',
@@ -299,11 +307,6 @@ function App() {
                 </Container>
                 </Container>                            
             </Container>
-
-            <Container item xs={12} >
-          { speech && <audio autoPlay src={speech}></audio> }
-        </Container>
-
         </div>
     );
 }
