@@ -36,3 +36,20 @@
     transform: rotate(360deg);
   }
 }
+
+.MuiPopover-paper.custom-select.MuiMenu-paper.MuiPaper-root {
+  opacity: 1;
+  transform: none;
+  min-width: 376px;
+  transition: opacity 412ms cubic-bezier(0.4, 0, 0.2, 1) 0ms, transform 274ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+  top: 190px;
+  left: 992px;
+  transform-origin: 188px 110px;
+}
+
+
+#reload_href {
+  color: red !important ;/* Example color */
+  font-weight: bold !important; /* Example font weight */
+  text-decoration: none; /* Example text decoration */
+}
