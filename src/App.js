@@ -68,6 +68,11 @@ function App() {
     const [checked1, setChecked1] = useState(false);
     const [selectedFile, setSelectedFile] = useState(null);
     const [isContainerOpen, setIsContainerOpen] = useState(false);
+    const [speed, setSpeed] = React.useState('1.0'); 
+    const [volume, setVolume] = React.useState('1');
+    const [voiceQuality, setVoiceQuality] = React.useState('0');
+    const [pitch, setPitch] = React.useState('1');
+    const [pauseTime, setPauseTime] = React.useState('0');
 
     const handleChange = (event) => {
         setText(event.target.value);
@@ -78,7 +83,6 @@ function App() {
     }, []);
 
     useEffect(()=>{
-        console.log("speech changed")
     },[speech])
 
     const handleChange1 = val => {
@@ -95,7 +99,8 @@ function App() {
     };
 
     const convertToSpeech = (language) => {
-        const audioSrc = `http://api.voicerss.org/?key=${apiKey}&hl=${language}&src=${text}`;
+        const audioSrc = `http://api.voicerss.org/?key=${apiKey}&hl=${language}&src=${text}&c=MP3&f=48khz_16bit_stereo&eq=2&r=${voiceQuality}&s=${speed}&v=${volume}&a=${pitch}&p=${pauseTime}`;
+        console.log(audioSrc)
         setSpeech(audioSrc);
         newspeech.current = audioSrc;
        
@@ -115,6 +120,26 @@ function App() {
 
     const handleMoreSettingToggle = () => {
         setIsContainerOpen(!isContainerOpen);
+    };
+
+    const handleSpeedChange = (event) => {
+        setSpeed(event.target.value);
+    };
+
+    const handleVolumeChange = (event) => {
+        setVolume(event.target.value);
+    };
+
+    const handleVoiceQualityChange = (event) => {
+        setVoiceQuality(event.target.value);
+    };
+
+    const handlePitchChange = (event) => {
+        setPitch(event.target.value);
+    };
+
+    const handlePauseTimeChange = (event) => {
+        setPauseTime(event.target.value);
     };
 
     const clearTextWithAnimation = () => {
@@ -279,26 +304,16 @@ function App() {
                   }}></i> More Setting
                 </Button>
                 {isContainerOpen && (
-                    <Container>
+                    <Container style={{
+                        marginLeft: '-23px',
+                        marginBottom: '20px',
+                    }}>
                     <Container  style={{
-                                display: 'block',
-                                width: '500px',
+                                width: '400px',
                                 padding: '.6125rem 1rem',
-                                fontSize: '.875rem',
-                                fontWeight: 400,
-                                lineHeight: 1.5,
-                                color: '#1e2022',
                                 backgroundColor: '#fff',
-                                backgroundClip: 'padding-box',
-                                border: '.0625rem solid rgba(0, 0, 0, .6)',
-                                WebkitAppearance: 'none',
-                                MozAppearance: 'none',
-                                appearance: 'none',
-                                borderRadius: '.3125rem',
-                                borderWidth: '2px !important',
-                                marginTop: '.5rem !important',
+                                border: '1px solid rgba(0, 0, 0, .6)',
                                 background: '#fbfbfb url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' height=\'48\' viewBox=\'0 0 84 48\'%3E%3Cpath d=\'M0 0h12v6H0V0zm28 8h12v6H28V8zm14-8h12v6H42V0zm14 0h12v6H56V0zm0 8h12v6H56V8zM42 8h12v6H42V8zm0 16h12v6H42v-6zm14-8h12v6H56v-6zm14 0h12v6H70v-6zm0-16h12v6H70V0zM28 32h12v6H28v-6zM14 16h12v6H14v-6zM0 24h12v6H0v-6zm0 8h12v6H0v-6zm14 0h12v6H14v-6zm14 8h12v6H28v-6zm-14 0h12v6H14v-6zm28 0h12v6H42v-6zm14-8h12v6H56v-6zm0-8h12v6H56v-6zm14 8h12v6H70v-6zm0 8h12v6H70v-6zM14 24h12v6H14v-6zm14-8h12v6H28v-6zM14 8h12v6H14V8zM0 8h12v6H0V8z\' fill=\'%23d0d0c4\' fill-opacity=\'0.15\' fill-rule=\'evenodd\'/%3E%3C/svg%3E")',
-                                transition: 'border-color .15s ease-in-out, box-shadow .15s ease-in-out'
                             }}>
                         <Typography variant="h4" style={{
                                 color: '#8c98a4',
@@ -376,27 +391,16 @@ function App() {
                             </div>
                             <RadioGroup defaultValue="mp3" name="RadioUserSelectAudioFormat" style={{
                                 display: 'flex',
-                                flexDirection: 'row',                   
+                                flexDirection: 'row', 
+                                flexWrap: 'nowrap',                  
                             }}>
                             <FormControlLabel
                                 value="mp3"
-                                style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    padding: '.6125rem 1rem',
-                                    fontSize: '.875rem',
-                                    fontWeight: 400,
-                                    lineHeight: 1.5,
-                                    color: '#1e2022',
+                                style={{                                  
+                                    padding: '10px',                            
                                     backgroundColor: '#fff',
-                                    backgroundClip: 'padding-box',
-                                    border: '.0625rem solid rgba(0, 0, 0, .6)',
-                                    WebkitAppearance: 'none',
-                                    MozAppearance: 'none',
-                                    appearance: 'none',
-                                    borderRadius: '.3125rem',
-                                    marginLeft:'5px',
-                                    transition: 'border-color .15s ease-in-out, box-shadow .15s ease-in-out'
+                                    border: '.0625rem solid rgba(0, 0, 0, .6)',                          
+                                    marginLeft:'5px',                                 
                                 }}
                                 control={<Radio style={{
                                     marginLeft: '-15px'
@@ -408,22 +412,10 @@ function App() {
                                     </div>
                                 }
                                 />
-                            <FormControlLabel value="ogg" style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    padding: '.6125rem 1rem',
-                                    fontSize: '.875rem',
-                                    fontWeight: 400,
-                                    lineHeight: 1.5,
-                                    color: '#1e2022',
+                            <FormControlLabel value="ogg" style={{                                  
+                                    padding: '10px',                            
                                     backgroundColor: '#fff',
-                                    backgroundClip: 'padding-box',
-                                    border: '.0625rem solid rgba(0, 0, 0, .6)',
-                                    WebkitAppearance: 'none',
-                                    MozAppearance: 'none',
-                                    appearance: 'none',
-                                    borderRadius: '.3125rem',
-                                    transition: 'border-color .15s ease-in-out, box-shadow .15s ease-in-out'
+                                    border: '.0625rem solid rgba(0, 0, 0, .6)',                                                        
                                 }}control={<Radio style={{
                                     marginLeft: '-15px'
                                 }} />} label={
@@ -432,22 +424,10 @@ function App() {
                                     <div style={{ marginLeft: '5px' }}>OGG</div>
                                     </div>
                                 }/>
-                            <FormControlLabel value="aac" style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    padding: '.6125rem 1rem',
-                                    fontSize: '.875rem',
-                                    fontWeight: 400,
-                                    lineHeight: 1.5,
-                                    color: '#1e2022',
+                            <FormControlLabel value="aac"  style={{                                  
+                                    padding: '10px',                            
                                     backgroundColor: '#fff',
-                                    backgroundClip: 'padding-box',
-                                    border: '.0625rem solid rgba(0, 0, 0, .6)',
-                                    WebkitAppearance: 'none',
-                                    MozAppearance: 'none',
-                                    appearance: 'none',
-                                    borderRadius: '.3125rem',
-                                    transition: 'border-color .15s ease-in-out, box-shadow .15s ease-in-out'
+                                    border: '.0625rem solid rgba(0, 0, 0, .6)',                                                      
                                 }}control={<Radio style={{
                                     marginLeft: '-15px'
                                 }} />} label={
@@ -468,12 +448,139 @@ function App() {
                                 margin: '1em 0 1em',
                                 marginRight: '10px'
                             }}>🗃️ MP3 Audio Quality</Typography>
-                            <Select defaultValue="0" id="userSelectTTSVoiceQuality">
-                            <MenuItem value="0">Standard Quality (small size, fast synthesis)</MenuItem>
-                            <MenuItem value="1">High Quality (large size, slow synthesis)</MenuItem>
+                              <Select
+                                    labelId="userSelectTTSVoiceQuality-label"
+                                    id="userSelectTTSVoiceQuality"
+                                    value={voiceQuality}
+                                    onChange={handleVoiceQualityChange}
+                                >
+                                    <MenuItem value="0">Standard Quality (small size, fast synthesis)</MenuItem>
+                                    <MenuItem value="1">High Quality (large size, slow synthesis)</MenuItem>
                             </Select>
                         </FormControl>
-                
+                        <FormControl>
+                            <Typography variant="body1"  style={{
+                                marginBottom: '1rem !important',
+                                fontSize: '.875rem',
+                                color: '#1e2022',
+                                fontWeight: 'bold',
+                                margin: '1em 0 1em',
+                                marginRight: '10px'
+                            }}>🗣️ Voice Speed</Typography>
+                            <Select
+                                labelId="userSelectTTSSettingSpeed-label"
+                                id="userSelectTTSSettingSpeed"
+                                value={speed}
+                                onChange={handleSpeedChange}
+                            >
+                                <MenuItem value="0.5">⏪ 0.5x</MenuItem>
+                                <MenuItem value="0.6">⏪ 0.6x</MenuItem>
+                                <MenuItem value="0.7">⏪ 0.7x</MenuItem>
+                                <MenuItem value="0.8">⏪ 0.8x</MenuItem>
+                                <MenuItem value="0.85">⏪ 0.85x</MenuItem>
+                                <MenuItem value="0.9">⏪ 0.9x</MenuItem>
+                                <MenuItem value="0.95">⏪ 0.95x</MenuItem>
+                                <MenuItem value="1.0">1.0x (Default)</MenuItem>
+                                <MenuItem value="1.05">⏩ 1.05x</MenuItem>
+                                <MenuItem value="1.1">⏩ 1.1x</MenuItem>
+                                <MenuItem value="1.15">⏩ 1.15x</MenuItem>
+                                <MenuItem value="1.2">⏩ 1.2x</MenuItem>
+                                <MenuItem value="1.25">⏩ 1.25x</MenuItem>
+                                <MenuItem value="1.3">⏩ 1.3x</MenuItem>
+                                <MenuItem value="1.4">⏩ 1.4x</MenuItem>
+                                <MenuItem value="1.5">⏩ 1.5x</MenuItem>
+                                <MenuItem value="2.0">⏩ 2.0x</MenuItem>
+                            </Select>
+                        </FormControl>
+                        <FormControl>
+                            <Typography variant="body1"  style={{
+                                marginBottom: '1rem !important',
+                                fontSize: '.875rem',
+                                color: '#1e2022',
+                                fontWeight: 'bold',
+                                margin: '1em 0 1em',
+                                marginRight: '10px'
+                            }}>📢 Voice Volume</Typography>
+                           <Select
+                                labelId="userSelectTTSSettingVolume-label"
+                                id="userSelectTTSSettingVolume"
+                                value={volume}
+                                onChange={handleVolumeChange}
+                            >
+                                <MenuItem value="0.1">🔽 10%</MenuItem>
+                                <MenuItem value="0.3">🔽 30%</MenuItem>
+                                <MenuItem value="0.5">🔽 50%</MenuItem>
+                                <MenuItem value="0.8">🔽 80%</MenuItem>
+                                <MenuItem value="1">100% (Default)</MenuItem>
+                                <MenuItem value="1.2">🔼 120%</MenuItem>
+                                <MenuItem value="1.5">🔼 150%</MenuItem>
+                                <MenuItem value="1.8">🔼 180%</MenuItem>
+                                <MenuItem value="2.0">🔼 200%</MenuItem>
+                            </Select>
+                        </FormControl>
+                        <FormControl>
+                            <Typography variant="body1"  style={{
+                                marginBottom: '1rem !important',
+                                fontSize: '.875rem',
+                                color: '#1e2022',
+                                fontWeight: 'bold',
+                                margin: '1em 0 1em',
+                                marginRight: '10px'
+                            }}>🎚️ Pitch Adjustment (Can be used for voice changing effects)</Typography>
+                                <Select
+                                    labelId="userSelectTTSSettingPitch-label"
+                                    id="userSelectTTSSettingPitch"
+                                    value={pitch}
+                                    onChange={handlePitchChange}
+                                >
+                                    <MenuItem value="2.0">🔼 Super High pitch (+100%)</MenuItem>
+                                    <MenuItem value="1.5">🔼 High pitch (+50%)</MenuItem>
+                                    <MenuItem value="1.25">🔼 Medium-high pitch (+25%)</MenuItem>
+                                    <MenuItem value="1.1">🔼 Slightly high pitch (+10%)</MenuItem>
+                                    <MenuItem value="1.05">🔼 Slightly high pitch (+5%)</MenuItem>
+                                    <MenuItem value="1">Default (normal pitch)</MenuItem>
+                                    <MenuItem value="0.95">🔽 Slightly low pitch (-5%)</MenuItem>
+                                    <MenuItem value="0.9">🔽 Slightly low pitch (-10%)</MenuItem>
+                                    <MenuItem value="0.75">🔽 Low pitch (-25%)</MenuItem>
+                                    <MenuItem value="0.5">🔽 Super low pitch (-50%)</MenuItem>
+                                </Select>
+                        </FormControl>
+                        <FormControl>
+                            <Typography variant="body1"  style={{
+                                marginBottom: '1rem !important',
+                                fontSize: '.875rem',
+                                color: '#1e2022',
+                                fontWeight: 'bold',
+                                margin: '1em 0 1em',
+                                marginRight: '10px',                                
+                            }}>🕒 Adjust the pause time of each paragraph (new line)</Typography>
+                                <Select
+                                    labelId="userSelectTTSParagraphPauseTime-label"
+                                    id="userSelectTTSParagraphPauseTime"
+                                    value={pauseTime}
+                                    onChange={handlePauseTimeChange}
+                                >
+                                    <MenuItem value="-1">🕒 0ms (eliminate pauses)</MenuItem>
+                                    <MenuItem value="50">🕒 50ms</MenuItem>
+                                    <MenuItem value="100">🕒 100ms</MenuItem>
+                                    <MenuItem value="200">🕒 200ms</MenuItem>
+                                    <MenuItem value="0">Default (300ms)</MenuItem>
+                                    <MenuItem value="600">🕒 600ms</MenuItem>
+                                    <MenuItem value="800">🕒 800ms</MenuItem>
+                                    <MenuItem value="1000">🕒 1000ms</MenuItem>
+                                    <MenuItem value="1200">🕒 1200ms</MenuItem>
+                                    <MenuItem value="1500">🕒 1500ms</MenuItem>
+                                    <MenuItem value="1800">🕒 1800ms</MenuItem>
+                                    <MenuItem value="2000">🕒 2000ms</MenuItem>
+                                    <MenuItem value="2500">🕒 2500ms</MenuItem>
+                                    <MenuItem value="3000">🕒 3000ms</MenuItem>
+                                    <MenuItem value="4000">🕒 4000ms</MenuItem>
+                                    <MenuItem value="5000">🕒 5000ms</MenuItem>
+                                    <MenuItem value="6000">🕒 6000ms</MenuItem>
+                                    <MenuItem value="8000">🕒 8000ms</MenuItem>
+                                    <MenuItem value="10000">🕒 10000ms</MenuItem>
+                                </Select>
+                        </FormControl>
                         </FormGroup>
                     </Container>
                     </Container>
