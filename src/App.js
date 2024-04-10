@@ -1,69 +1,37 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { AppBar, Container, Toolbar, Typography, TextField, MenuItem, Select, IconButton, InputAdornment, Button } from '@mui/material';
 import styled from '@emotion/styled';
+import { FormControl, FormGroup, FormControlLabel, Checkbox, RadioGroup, Radio } from '@mui/material';
 import {
   loadCaptchaEnginge,
   LoadCanvasTemplate,
   LoadCanvasTemplateNoReload,
   validateCaptcha,
 } from 'react-simple-captcha';
-
+import ReactSwitch from 'react-switch';
 import RefreshIcon from '@mui/icons-material/Refresh';
 
 const apiKey = '332c16d1a8db4a10b44047fd0888b485';
 
 const languages = [
   { value: 'en-us', label: 'English' },
-  { value: 'zh-cn', label: '中文 - Simplified and Traditional Chinese' },
-  { value: 'es-es', label: 'Español - Spanish' },
-  { value: 'pt-br', label: 'Portugues - Brazilian Portuguese' },
-  { value: 'de-de', label: 'Deutsch - German' },
-  { value: 'fr-fr', label: 'Français - French' },
-  { value: 'it-it', label: 'Italiano - Italian' },
-  { value: 'tr-tr', label: 'Türk - Turkish' },
-  { value: 'ru-ru', label: 'Русский - Russian' },
-  { value: 'ja-jp', label: '日本 - Japanese' },
-  { value: 'ko-kr', label: '한국의 - Korean' },
-  { value: 'ms-my', label: 'Melayu - Malay' },
-  { value: 'th-th', label: 'ภาษาไทย - Thai' },
-  { value: 'vi-vn', label: 'Tiếng Việt - Vietnamese' },
-  { value: 'id-id', label: 'bahasa Indonesia - Indonesian' },
-  { value: 'he-il', label: 'בעברית - Hebrew' },
-  { value: 'fi-fi', label: 'Suomi - Finnish' },
-  { value: 'sv-se', label: 'Svenska - Swedish' },
-  { value: 'nb-no', label: 'Norsk - Norwegian' },
-  { value: 'da-dk', label: 'Dansk - Danish' },
-  { value: 'hi-in', label: 'हिंदी - Hindi' },
-  { value: 'ar', label: 'العربية - Arabic' },
-  { value: 'ro-ro', label: 'Română - Romanian' },
-  { value: 'hu-hu', label: 'Magyar - Hungarian' },
-  { value: 'pl-pl', label: 'Polski - Polish' },
-  { value: 'nl-nl', label: 'Nederlands - Dutch' },
-  { value: 'cs-cz', label: 'Čeština - Czech' },
-  { value: 'uk-ua', label: 'Українська - Ukrainian' },
-  { value: 'hr-hr', label: 'Hrvatski - Croatian' },
-  { value: 'el-gr', label: 'Ελληνικά - Greek' },
-  { value: 'sk-sk', label: 'Slovenčina - Slovak' },
-  { value: 'bg-bg', label: 'Български - Bulgarian' },
-  { value: 'sl-si', label: 'Slovenščina - Slovenian' },
-  { value: 'ca-es', label: 'Català - Catalan' },
-  { value: 'ga-ie', label: 'Gaeilge - Irish' },
-  { value: 'lt-lt', label: 'Lietuvių - Lithuanian' },
-  { value: 'mt-mt', label: 'Malti - Maltese' },
-  { value: 'et-ee', label: 'Eesti - Estonian' },
-  { value: 'is-is', label: 'Íslenska - Icelandic' },
-  { value: 'lv-lv', label: 'Latviešu - Latvian' },
-  { value: 'ur-in', label: 'اردو - Urdu' },
-  { value: 'ta-in', label: 'தமிழ் - Tamil' },
-  { value: 'mr-in', label: 'मराठी - Marathi' },
-  { value: 'te-in', label: 'తెలుగు - Telugu' },
-  { value: 'gu-in', label: 'ગુજરાતી - Gujarati' },
-  { value: 'ml-in', label: 'മലയാളം - Malayalam' },
-  { value: 'kn-in', label: 'ಕನ್ನಡ - Kannada' },
-  { value: 'bn-bd', label: 'বাংলা - Bengali' },
-  { value: 'fa-ir', label: 'فارسی - Persian' },
-  { value: 'fil-ph', label: 'Filipino - Filipino' },
-  { value: 'sw-ke', label: 'Kiswahili - Swahili' }
+  { value: 'ar-eg', label: 'Arabic (Egypt)' },
+  { value: 'ar-sa', label: 'Arabic (Saudi Arabia)' },
+  { value: 'zh-cn', label: 'Chinese' },
+  { value: 'nl-be', label: 'Dutch' },
+  { value: 'en-ca', label: 'English (Canada)' },
+  { value: 'fr-fr', label: 'French' },
+  { value: 'de-de', label: 'German' },
+  { value: 'el-gr', label: 'Greek' },
+  { value: 'hi-in', label: 'Hindi' },
+  { value: 'id-id', label: 'Indonesian' },
+  { value: 'it-it', label: 'Italian' },
+  { value: 'ja-jp', label: 'Japanese' },
+  { value: 'ko-kr', label: 'Korean' },
+  { value: 'pt-pt', label: 'Portuguese' },
+  { value: 'ru-ru', label: 'Russian' },
+  { value: 'es-es', label: 'Spanish ' },
+  { value: 'sv-se', label: 'Swedish' }
 ];
 
 
@@ -91,25 +59,62 @@ function App() {
     const [isHovered, setIsHovered] = useState(false);
     const [isHovered1, setIsHovered1] = useState(false);
     const [text, setText] = useState('');
+    const [selectedLanguage, setSelectedLanguage] = useState('en-us');
     const [filteredLanguages, setFilteredLanguages] = useState(languages);
     const maxChars = 3000;
     const [speech, setSpeech] = useState('');
+    const newspeech = useRef();
+    const [checked, setChecked] = useState(false);
+    const [checked1, setChecked1] = useState(false);
+    const [selectedFile, setSelectedFile] = useState(null);
+    const [isContainerOpen, setIsContainerOpen] = useState(false);
 
     const handleChange = (event) => {
         setText(event.target.value);
     };
-
+   
     useEffect(() => {
-      loadCaptchaEnginge(6);
-  }, []);
+        loadCaptchaEnginge(5,"blue","white");
+    }, []);
 
+    useEffect(()=>{
+        console.log("speech changed")
+    },[speech])
 
-    const handleLanguageSearch = (event) => {
-        const query = event.target.value.toLowerCase();
-        const filtered = languages.filter(language =>
-            language.label.toLowerCase().includes(query)
-        );
-        setFilteredLanguages(filtered);
+    const handleChange1 = val => {
+        setChecked(val);
+    }
+
+    const handleChange2 = (checked) => {      
+        if (checked || checked1) {
+          setChecked1(checked);
+        }
+      };
+    const handleLanguageChange = (event) => {
+        setSelectedLanguage(event.target.value);
+    };
+
+    const convertToSpeech = (language) => {
+        const audioSrc = `http://api.voicerss.org/?key=${apiKey}&hl=${language}&src=${text}`;
+        setSpeech(audioSrc);
+        newspeech.current = audioSrc;
+       
+    };
+
+    const handleFileUpload = (event) => {
+        const file = event.target.files[0]; 
+        if (file && file.type.startsWith('audio/')) {
+          setSelectedFile(file); 
+          setChecked1(true);
+          alert('Audio get uploaded');
+        } else {
+          event.target.value = null;        
+          alert('Please select a valid audio file.');
+        }
+    };      
+
+    const handleMoreSettingToggle = () => {
+        setIsContainerOpen(!isContainerOpen);
     };
 
     const clearTextWithAnimation = () => {
@@ -123,12 +128,6 @@ function App() {
         }
     };
 
-    const handleConvertToSpeech=() =>{
-      const audioSrc = `http://api.voicerss.org/?key=${apiKey}&src=${text}`
-
-      setSpeech(audioSrc);
-    }
-
     return (
         <div>
             <AppBar position="static" sx={{ backgroundColor: 'white' }}>
@@ -140,14 +139,12 @@ function App() {
             </AppBar>        
             <Container sx={{ display: 'flex', marginTop: '20px' }}>
                 <Container sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', marginTop: '20px' }}>
-                  <Container item xs={12}>                    
-                      {speech && (
-                        <audio controls autoPlay name="media" style={{ width: '100%', marginTop: '20px' }}>
-                          <source src={speech} type="audio/wav" />
-                            Your browser does not support the audio element.
-                        </audio>
-                      )}
-                  </Container>
+                    <Container item xs={12}>                    
+                        {speech && (                           
+                            <audio controls autoPlay src={speech} style={{ width: '100%', marginTop: '20px' }}></audio>
+                        )}
+                    </Container>
+
                     <div style={{
                         fontSize: '.875rem',
                         fontWeight: 'bold',
@@ -215,14 +212,14 @@ function App() {
                     </div>
                     <SelectContainer>
                         <Select
-                            defaultValue="en-us"
+                            value={selectedLanguage}
                             className="custom-select"
                             style={{
                                 width: '380px',
                             }}
-                            onChange={handleLanguageSearch}
+                            onChange={handleLanguageChange}
                         >
-                            {filteredLanguages.map((language) => (
+                             {filteredLanguages.map((language) => (
                                 <MenuItem key={language.value} value={language.value}>{language.label}</MenuItem>
                             ))}
                         </Select>
@@ -242,7 +239,7 @@ function App() {
                       style: { height: '60px', fontSize: '24px', borderColor: '#1e2022' },
                       endAdornment: (
                         <InputAdornment position="end">
-                            <LoadCanvasTemplate/>
+                            <LoadCanvasTemplateNoReload />
                             <IconButton onClick={() => loadCaptchaEnginge(6)} size="large">
                                 <RefreshIcon />
                             </IconButton>
@@ -252,6 +249,7 @@ function App() {
                   />
                 </Container>
                 <Container sx={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', marginTop: '20px' }}>
+                <div>
                 <Button
                   style={{ whiteSpace: 'nowrap', 
                   backgroundColor: isHovered1 ? '#c3c6d1' : '#f0f1f3',
@@ -271,7 +269,7 @@ function App() {
                 
                 onMouseEnter={() => setIsHovered1(true)}
                 onMouseLeave={() => setIsHovered1(false)}
-                  // onClick={handleMoreSettingToggle}
+                  onClick={handleMoreSettingToggle}
                 >
                   <i className="bi bi-sliders p-1"  style={{
                     padding: '0.25rem !important',
@@ -280,6 +278,208 @@ function App() {
                     marginRight: '10px',
                   }}></i> More Setting
                 </Button>
+                {isContainerOpen && (
+                    <Container>
+                    <Container  style={{
+                                display: 'block',
+                                width: '500px',
+                                padding: '.6125rem 1rem',
+                                fontSize: '.875rem',
+                                fontWeight: 400,
+                                lineHeight: 1.5,
+                                color: '#1e2022',
+                                backgroundColor: '#fff',
+                                backgroundClip: 'padding-box',
+                                border: '.0625rem solid rgba(0, 0, 0, .6)',
+                                WebkitAppearance: 'none',
+                                MozAppearance: 'none',
+                                appearance: 'none',
+                                borderRadius: '.3125rem',
+                                borderWidth: '2px !important',
+                                marginTop: '.5rem !important',
+                                background: '#fbfbfb url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' height=\'48\' viewBox=\'0 0 84 48\'%3E%3Cpath d=\'M0 0h12v6H0V0zm28 8h12v6H28V8zm14-8h12v6H42V0zm14 0h12v6H56V0zm0 8h12v6H56V8zM42 8h12v6H42V8zm0 16h12v6H42v-6zm14-8h12v6H56v-6zm14 0h12v6H70v-6zm0-16h12v6H70V0zM28 32h12v6H28v-6zM14 16h12v6H14v-6zM0 24h12v6H0v-6zm0 8h12v6H0v-6zm14 0h12v6H14v-6zm14 8h12v6H28v-6zm-14 0h12v6H14v-6zm28 0h12v6H42v-6zm14-8h12v6H56v-6zm0-8h12v6H56v-6zm14 8h12v6H70v-6zm0 8h12v6H70v-6zM14 24h12v6H14v-6zm14-8h12v6H28v-6zM14 8h12v6H14V8zM0 8h12v6H0V8z\' fill=\'%23d0d0c4\' fill-opacity=\'0.15\' fill-rule=\'evenodd\'/%3E%3C/svg%3E")',
+                                transition: 'border-color .15s ease-in-out, box-shadow .15s ease-in-out'
+                            }}>
+                        <Typography variant="h4" style={{
+                                color: '#8c98a4',
+                                fontSize: 'calc(1.275rem + .3vw)',
+                                fontWeight: '600',
+                                lineHeight: '1.2',
+                        }}>More Setting</Typography>
+                        <div style={{
+                            display: 'flex',
+                            alignItems: 'flex-start',
+                            flexBasis: 'auto',
+                            flexDirection: 'row',
+                            flexGrow: 0,
+                            flexShrink: 1,
+                            flexWrap: 'wrap',             
+                        }}>
+                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                            <Typography variant="body1" style={{
+                                marginBottom: '1rem !important',
+                                fontSize: '.875rem',
+                                color: '#1e2022',
+                                fontWeight: 'bold',
+                                margin: '1em 0 1em',
+                                marginRight: '10px'
+                            }}>🎧 Try Listen Mode: saving character quota</Typography>
+                            <ReactSwitch
+                                checked={checked}
+                                onChange={handleChange1}
+                            />
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                            <Typography variant="body1" style={{
+                                marginBottom: '1rem !important',
+                                fontSize: '.875rem',
+                                color: '#1e2022',
+                                fontWeight: 'bold',
+                                margin: '1em 0 1em',
+                                marginRight: '10px'
+                            }}>🎹 Add Background Music</Typography>
+                            <ReactSwitch
+                                checked={checked1}
+                                onChange={handleChange2}
+                            />
+                        </div>
+                        <div>
+                            <Typography variant="body1">
+                                <input
+                                type="file"
+                                id="userSelectUseBackgroundMusicModal_btn"
+                                onChange={handleFileUpload}
+                                style={{ display: 'none' }}
+                                />
+                                <label htmlFor="userSelectUseBackgroundMusicModal_btn" style={{ cursor: 'pointer', color: 'blue', textDecoration: 'underline' }}>
+                                BGM upload and management
+                                </label>
+                            </Typography>
+                        </div>        
+                        </div>
+                        <div style={{
+                            marginTop: '10px'
+                        }}>
+                            <Typography variant="body1" style={{
+                                marginBottom: '1rem !important',
+                                fontSize: '.875rem',
+                                color: '#1e2022',
+                                fontWeight: 'bold',
+                                margin: '1em 0 1em',
+                                marginRight: '10px'
+                            }}>🗂️ Audio Files Format</Typography>
+                            <div>
+                                <div></div>
+                                <div></div>
+                                <div></div>
+                                <div></div>
+                            </div>
+                            <RadioGroup defaultValue="mp3" name="RadioUserSelectAudioFormat" style={{
+                                display: 'flex',
+                                flexDirection: 'row',                   
+                            }}>
+                            <FormControlLabel
+                                value="mp3"
+                                style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    padding: '.6125rem 1rem',
+                                    fontSize: '.875rem',
+                                    fontWeight: 400,
+                                    lineHeight: 1.5,
+                                    color: '#1e2022',
+                                    backgroundColor: '#fff',
+                                    backgroundClip: 'padding-box',
+                                    border: '.0625rem solid rgba(0, 0, 0, .6)',
+                                    WebkitAppearance: 'none',
+                                    MozAppearance: 'none',
+                                    appearance: 'none',
+                                    borderRadius: '.3125rem',
+                                    marginLeft:'5px',
+                                    transition: 'border-color .15s ease-in-out, box-shadow .15s ease-in-out'
+                                }}
+                                control={<Radio style={{
+                                    marginLeft: '-15px'
+                                }} />}
+                                label={
+                                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                                    <img src="https://ttsmaker.com/static/v3_theme_01_asset/img/mp3.svg" alt="" style={{ maxHeight: '32px' }} />
+                                    <div style={{ marginLeft: '5px' }}>MP3</div>
+                                    </div>
+                                }
+                                />
+                            <FormControlLabel value="ogg" style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    padding: '.6125rem 1rem',
+                                    fontSize: '.875rem',
+                                    fontWeight: 400,
+                                    lineHeight: 1.5,
+                                    color: '#1e2022',
+                                    backgroundColor: '#fff',
+                                    backgroundClip: 'padding-box',
+                                    border: '.0625rem solid rgba(0, 0, 0, .6)',
+                                    WebkitAppearance: 'none',
+                                    MozAppearance: 'none',
+                                    appearance: 'none',
+                                    borderRadius: '.3125rem',
+                                    transition: 'border-color .15s ease-in-out, box-shadow .15s ease-in-out'
+                                }}control={<Radio style={{
+                                    marginLeft: '-15px'
+                                }} />} label={
+                                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                                    <img src="https://ttsmaker.com/static/v3_theme_01_asset/img/ogg.svg" alt="" style={{ maxHeight: '32px' }} />
+                                    <div style={{ marginLeft: '5px' }}>OGG</div>
+                                    </div>
+                                }/>
+                            <FormControlLabel value="aac" style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    padding: '.6125rem 1rem',
+                                    fontSize: '.875rem',
+                                    fontWeight: 400,
+                                    lineHeight: 1.5,
+                                    color: '#1e2022',
+                                    backgroundColor: '#fff',
+                                    backgroundClip: 'padding-box',
+                                    border: '.0625rem solid rgba(0, 0, 0, .6)',
+                                    WebkitAppearance: 'none',
+                                    MozAppearance: 'none',
+                                    appearance: 'none',
+                                    borderRadius: '.3125rem',
+                                    transition: 'border-color .15s ease-in-out, box-shadow .15s ease-in-out'
+                                }}control={<Radio style={{
+                                    marginLeft: '-15px'
+                                }} />} label={
+                                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                                    <img src="https://ttsmaker.com/static/v3_theme_01_asset/img/aac.svg" alt="" style={{ maxHeight: '32px' }} />
+                                    <div style={{ marginLeft: '5px' }}>AAC</div>
+                                    </div>
+                                }/>
+                            </RadioGroup>
+                        </div>
+                        <FormGroup>
+                        <FormControl>
+                            <Typography variant="body1"  style={{
+                                marginBottom: '1rem !important',
+                                fontSize: '.875rem',
+                                color: '#1e2022',
+                                fontWeight: 'bold',
+                                margin: '1em 0 1em',
+                                marginRight: '10px'
+                            }}>🗃️ MP3 Audio Quality</Typography>
+                            <Select defaultValue="0" id="userSelectTTSVoiceQuality">
+                            <MenuItem value="0">Standard Quality (small size, fast synthesis)</MenuItem>
+                            <MenuItem value="1">High Quality (large size, slow synthesis)</MenuItem>
+                            </Select>
+                        </FormControl>
+                
+                        </FormGroup>
+                    </Container>
+                    </Container>
+                )}
+                </div>
+                
                 <Button
                   style={{  backgroundColor: isHovered ? '#fab005' : '#ffd43b',
                   padding: '0.75rem 1rem',
@@ -292,7 +492,7 @@ function App() {
                   borderTopLeftRadius: '0',
                   borderBottomLeftRadius: '0',
                   boxShadow: isHovered ? '0px 8px 8px rgba(0, 0, 0, 0.25)' : 'none',}}                 
-                  onClick={handleConvertToSpeech}
+                  onClick={(e)=>convertToSpeech(selectedLanguage)}
                   onMouseEnter={() => setIsHovered(true)}
                   onMouseLeave={() => setIsHovered(false)}
                 >
@@ -307,7 +507,9 @@ function App() {
                 </Container>
                 </Container>                            
             </Container>
+   
         </div>
+        
     );
 }
 
