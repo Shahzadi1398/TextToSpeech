@@ -11,10 +11,8 @@ import {
 import ReactSwitch from 'react-switch';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import Waveform from "./Waveform";
-import { AudioVisualizer } from 'react-audio-visualize';
-import WaveSurfer from 'wavesurfer.js';
+
 const apiKey = '332c16d1a8db4a10b44047fd0888b485';
-// import Regions from 'wavesurfer.js/dist/plugins/regions.esm.js' 
 
 const languages = [
   { value: 'en-us', label: 'English' },
@@ -65,33 +63,26 @@ function App() {
     const [text, setText] = useState('');
     const [selectedLanguage, setSelectedLanguage] = useState('en-us');
     const [filteredLanguages, setFilteredLanguages] = useState(languages);
-    const maxChars = 1500;
+    const maxChars = 3000;
     const [speech, setSpeech] = useState('');
     const newspeech = useRef();
     const [checked, setChecked] = useState(false);
     const [checked1, setChecked1] = useState(false);
     const [selectedFile, setSelectedFile] = useState(null);
     const [isContainerOpen, setIsContainerOpen] = useState(false);
-    const [speed, setSpeed] = React.useState('1'); 
+    const [speed, setSpeed] = React.useState('1.0'); 
     const [volume, setVolume] = React.useState('1');
-    const [voiceQuality, setVoiceQuality] = React.useState('8khz_8bit_stereo');
+    const [voiceQuality, setVoiceQuality] = React.useState('0');
+    const [pitch, setPitch] = React.useState('1');
+    const [pauseTime, setPauseTime] = React.useState('0');
     const [audioCreated, setAudioCreated] = useState(false);
-    const [isAudioPlaying, setIsAudioPlaying] = useState(false);
-    const language = "en-US";
-    const [audioFormat, setAudioFormat] = useState('mp3');
-    const audioContext = new AudioContext();
-    const [isDropdownChanged, setIsDropdownChanged] = React.useState(false);
-    const [isCaptchaCorrect, setIsCaptchaEntered] = React.useState(false);
-    const [blob, setBlob] = useState();
-    const visualizerRef = useRef(null)
-    const [audioUrl, setAudioUrl] = useState(null);
 
     const handleChange = (event) => {
         setText(event.target.value);
     };
    
     useEffect(() => {
-        loadCaptchaEnginge(5,"rgb(18, 78, 102)","white");     
+        loadCaptchaEnginge(5,"blue","white");
     }, []);
 
     useEffect(()=>{
@@ -109,7 +100,25 @@ function App() {
     const handleLanguageChange = (event) => {
         setSelectedLanguage(event.target.value);
     };
-    
+
+    const convertToSpeech = (language) => {
+        const audioSrc = `http://api.voicerss.org/?key=${apiKey}&hl=${language}&src=${text}&c=MP3&f=48khz_16bit_stereo&eq=2&r=${voiceQuality}&s=${speed}&v=${volume}&a=${pitch}&p=${pauseTime}`;
+        setSpeech(audioSrc);
+        newspeech.current = audioSrc;
+        setAudioCreated(true);
+    };
+
+    // const handleAudioPlay = () => {
+    //     if (wavesurfer.current) {
+    //         wavesurfer.current.play();
+    //     }
+    // };
+
+    // const handleAudioPause = () => {
+    //     if (wavesurfer.current) {
+    //         wavesurfer.current.pause();
+    //     }
+    // };
 
     const handleFileUpload = (event) => {
         const file = event.target.files[0]; 
@@ -123,106 +132,29 @@ function App() {
         }
     };      
 
-    const handleAudioPlay = () => {
-        setIsAudioPlaying(true);
-    };
-    
-    const handleAudioPause = () => {
-        setIsAudioPlaying(false);
-    };
-
     const handleMoreSettingToggle = () => {
         setIsContainerOpen(!isContainerOpen);
     };
 
     const handleSpeedChange = (event) => {
-        const value = event.target.value;
-        setSpeed(value);
-        setIsDropdownChanged(true);
-    };    
+        setSpeed(event.target.value);
+    };
 
     const handleVolumeChange = (event) => {
-        const value = parseFloat(event.target.value);
-        setVolume(value);
-        setIsDropdownChanged(true);
+        setVolume(event.target.value);
     };
 
     const handleVoiceQualityChange = (event) => {
-        const value = event.target.value;
-        setVoiceQuality(value);
-        setIsDropdownChanged(true);
+        setVoiceQuality(event.target.value);
     };
 
-    const handleAudioFormatChange = (event) => {
-        setAudioFormat(event.target.value);
-        setIsDropdownChanged(true);
+    const handlePitchChange = (event) => {
+        setPitch(event.target.value);
     };
 
-
-    useEffect(() => {
-        if (isDropdownChanged) {
-        const audioSrc = convertToSpeech(language);
-        // playAudioWithVolume(audioSrc, volume);       
-    }
-    }, [audioFormat, speed, volume, voiceQuality, isDropdownChanged]);
-
-    const convertToSpeech = (language) => {
-        console.log("fsdfsdsdfsf")
-        const enteredCaptcha = document.getElementById("captchaInput").value;
-        console.log("fsdfsdf")
-        if (enteredCaptcha.length === 5) {
-            const isCaptchaCorrect = validateCaptcha(enteredCaptcha);
-            setIsCaptchaEntered(isCaptchaCorrect);
-            setAudioCreated(isCaptchaCorrect);  
-            const audioSrc = `http://api.voicerss.org/?key=${apiKey}&hl=${language}&src=${text}&c=${audioFormat}&r=${speed}&f=${voiceQuality}`;
-            console.log(audioSrc)
-            setSpeech(audioSrc);
-            fetch(`https://api.voicerss.org/?key=YOUR_API_KEY&hl=en-us&src=${encodeURIComponent(text)}`)
-      .then(response => response.blob())
-      .then(blob => {
-        const url = URL.createObjectURL(blob);
-        setAudioUrl(url);
-
-        // Generate voice waves
-        generateVoiceWaves(url);
-      })
-      .catch(error => console.error('Error:', error));
-          
-            newspeech.current = audioSrc;
-            if (!isCaptchaCorrect) {
-                alert("Captcha is wrong!");
-            } 
-            return audioSrc;            
-        }else {        
-            alert("Please enter a 5-character captcha.");
-        }            
+    const handlePauseTimeChange = (event) => {
+        setPauseTime(event.target.value);
     };
-    
-    const generateVoiceWaves = (audioUrl) => {
-        // Use a library like WaveSurfer.js to generate voice waves
-        const wavesurfer = WaveSurfer.create({
-          container: '#waveform',
-          waveColor: 'violet',
-          progressColor: 'purple',
-          url: {audioUrl},
-        });
-        
-        wavesurfer.load(audioUrl);
-      };
-    // const playAudioWithVolume = (audioSrc, volume) => {
-    //     console.log(volume)
-    //     const audio = new Audio(audioSrc);
-    //     console.log(audio)
-    //     const source = audioContext.createMediaElementSource(audio);
-    //     const gainNode = audioContext.createGain();
-    //     console.log(gainNode)
-    //     gainNode.gain.value = volume;
-    
-    //     source.connect(gainNode);
-    //     gainNode.connect(audioContext.destination);
-    //     audio.play();
-    // };
-    
 
     const clearTextWithAnimation = () => {
         const textLength = text.length;
@@ -236,11 +168,9 @@ function App() {
     };
 
     return (
-        <div style={{
-            background: 'linear-gradient(90deg, rgba(18, 78, 102, 1) 0%, rgba(116, 141, 146, 1) 35%, rgba(211, 217, 212, 1) 100%)',height:"100vh"
-        }}>
+        <div>
             <AppBar position="static" sx={{ backgroundColor: 'white' }}>
-            <Toolbar sx={{ color: 'white', background: 'linear-gradient(90deg, rgba(18, 78, 102, 1) 0%, rgba(116, 141, 146, 1) 35%, rgba(211, 217, 212, 1) 100%)' }}>
+                <Toolbar sx={{ borderBottom: '1px solid lightgrey', color: 'black' }}>
                     <Typography variant="h6" component="div" sx={{ flexGrow: 1, fontWeight: 'bold', textAlign: 'center', fontSize: '25px' }}>
                         Text to Speech
                     </Typography>
@@ -254,10 +184,6 @@ function App() {
                         justifyContent: 'center',
                         alignItems: 'center',
                         flexDirection: 'column',
-                        backgroundColor: '#f0f1f3',
-                        border: '.0625rem solid rgba(0, 0, 0, .6)',
-                        borderWidth: '2px',
-                        borderRadius: '0.3rem',
                     }}>
                         <img style={{
                             width: '7.875rem',
@@ -270,53 +196,29 @@ function App() {
                             color: '#183153',
                          }}>
                             convert text to speech success! </label>
-                        {/* <div id="waveform"></div> */}
+                        <Waveform
+                            speech={speech}
+                        />
                         {speech && (
                             <audio 
                             controls 
                             autoPlay 
-                            onPlay={handleAudioPlay}  
-                            onPause={handleAudioPause} 
                             src={speech} 
                             style={{ width: '100%', marginTop: '20px' }}></audio>
                         )}
-                        <div style={{display:"flex", marginBottom:"20px"}}>                       
-                            <Button
-                            style={{  backgroundColor: isHovered ? '#fab005' : '#ffd43b',
-                            padding: '0.75rem 1rem',
-                            fontSize: '13px',
-                            borderRadius: '0.3125rem',
-                            fontFamily: 'inherit',
-                            color: '#4b5157',
-                            width: '300px',
-                            border: '1px solid black',
-                            borderRadius: '0.3rem',
-                            boxShadow: isHovered ? '0px 8px 8px rgba(0, 0, 0, 0.25)' : 'none',}}               
-                            onMouseEnter={() => setIsHovered(true)}
-                            onMouseLeave={() => setIsHovered(false)}
-                            >
-                            <i className="bi bi-cloud-download-fill p-2" 
-                            style={{
-                                padding: '0.25rem !important',
-                                fontStyle: 'italic',
-                                fontSize: '.875rem',
-                                marginRight: '10px',
-                            }}></i> Download Voice File
-                            </Button>              
-                        </div>
                     </Container>
                     )}
                     <div style={{
-                        fontSize: '.875rem',    
+                        fontSize: '.875rem',
                         fontWeight: 'bold',
-                        color: 'white',
+                        color: '#1e2022',
                         padding: '10px'
                     }}>
                         Maximum characters {maxChars} remaining {maxChars - text.length} available
                         {text && (
                             <button style={{
                                 '--bs-text-opacity': 1,
-                                color: 'white',
+                                color: '#8c98a4',
                                 backgroundColor: 'transparent',
                                 border: 'transparent',
                             }} onClick={clearTextWithAnimation}>
@@ -331,7 +233,7 @@ function App() {
                         value={text}
                         onChange={handleChange}
                         inputProps={{
-                            maxLength: 1500,
+                            maxLength: 3000,
                             style: {
                                 width: '700px',
                                 height: '500px',
@@ -347,7 +249,6 @@ function App() {
                         }}
                         sx={{
                             '& .MuiOutlinedInput-root': {
-                                backgroundColor: 'white',
                                 borderBottomRightRadius: '0.3125rem',
                                 borderBottomLeftRadius: '0.3125rem',
                                 padding: '1.5rem',
@@ -367,7 +268,7 @@ function App() {
                     <div style={{
                         fontSize: '.875rem',
                         fontWeight: 'bold',
-                        color: "rgb(18, 78, 102)",
+                        color: '#1e2022',
                         padding: '10px'
                     }}>
                         Languages
@@ -378,7 +279,6 @@ function App() {
                             className="custom-select"
                             style={{
                                 width: '380px',
-                                backgroundColor: 'white'
                             }}
                             onChange={handleLanguageChange}
                         >
@@ -391,35 +291,29 @@ function App() {
                 <Container sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', marginTop: '20px' }}>
                   <div style={{
                         fontSize: '13px',                       
-                        color: 'rgb(18, 78, 102)',
-                        fontWeight: 'bold',
+                        color: '#1e2022',
                         padding: '10px'
                     }}>
                   Input verification code (identify the numbers in the picture)
                   </div>
                   <TextField
-                    id="captchaInput"
                     placeholder="Enter Captcha"
                     InputProps={{
-                      style: { height: '60px', fontSize: '24px', borderColor: '#1e2022', backgroundColor: 'white' },
-                      inputProps: { maxLength: 5 },
+                      style: { height: '60px', fontSize: '24px', borderColor: '#1e2022' },
                       endAdornment: (
                         <InputAdornment position="end" style={{marginTop:"10px !important"}}>
                             <LoadCanvasTemplateNoReload style={{marginTop:"10px !important"}}/>
-                            <IconButton onClick={() =>   loadCaptchaEnginge(5,"blue","white")} size="large" style={{marginTop:"10px !important"}}>
+                            <IconButton onClick={() => loadCaptchaEnginge(6)} size="large" style={{marginTop:"10px !important"}}>
                                 <RefreshIcon />
                             </IconButton>
                         </InputAdornment>
                     ),
                     }}
-                    // onChange={(e) => {                   
-                    //     handleCaptchaVerification(e.target.value);
-                    // }}        
                   />
                 </Container>
                 <Container sx={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', marginTop: '20px' }}>
                 <div style={{display:"flex"}}>
-                <Button                 
+                <Button
                   style={{ whiteSpace: 'nowrap', 
                   backgroundColor: isHovered1 ? '#c3c6d1' : '#f0f1f3',
                   overflow: 'hidden', 
@@ -447,21 +341,19 @@ function App() {
                     marginRight: '10px',
                   }}></i> More Setting
                 </Button>
-                <Button                 
-                  style={{  backgroundColor: isHovered ? 'rgb(116, 141, 146)' : 'rgb(18, 78, 102)',
+                <Button
+                  style={{  backgroundColor: isHovered ? '#fab005' : '#ffd43b',
                   padding: '0.75rem 1rem',
                   fontSize: '13px',
                   borderRadius: '0.3125rem',
                   fontFamily: 'inherit',
-                  color: 'white',
+                  color: '#4b5157',
                   width: '300px',
                   border: '1px solid black',
                   borderTopLeftRadius: '0',
                   borderBottomLeftRadius: '0',
                   boxShadow: isHovered ? '0px 8px 8px rgba(0, 0, 0, 0.25)' : 'none',}}                 
-                  onClick={(e) => {
-                    convertToSpeech(selectedLanguage);
-                }}
+                  onClick={(e)=>convertToSpeech(selectedLanguage)}
                   onMouseEnter={() => setIsHovered(true)}
                   onMouseLeave={() => setIsHovered(false)}
                 >
@@ -563,11 +455,7 @@ function App() {
                                 <div></div>
                                 <div></div>
                             </div>
-                            <RadioGroup     
-                            value={audioFormat}
-                            onChange={handleAudioFormatChange}
-                            name="RadioUserSelectAudioFormat" 
-                            style={{
+                            <RadioGroup defaultValue="mp3" name="RadioUserSelectAudioFormat" style={{
                                 display: 'flex',
                                 flexDirection: 'row', 
                                 flexWrap: 'nowrap',                  
@@ -632,20 +520,8 @@ function App() {
                                     value={voiceQuality}
                                     onChange={handleVoiceQualityChange}
                                 >
-                                    <MenuItem value="8khz_8bit_stereo">8 kHz, 8 Bit, Stereo</MenuItem>
-                                    <MenuItem value="8khz_16bit_stereo">8 kHz, 16 Bit, Stereo</MenuItem>
-                                    <MenuItem value="12khz_8bit_stereo">12 kHz, 8 Bit, Stereo</MenuItem>
-                                    <MenuItem value="12khz_16bit_stereo">12 kHz, 16 Bit, Stereo</MenuItem>
-                                    <MenuItem value="16khz_8bit_stereo">16 kHz, 8 Bit, Stereo</MenuItem>
-                                    <MenuItem value="16khz_16bit_stereo">16 kHz, 16 Bit, Stereo</MenuItem>
-                                    <MenuItem value="24khz_8bit_stereo">24 kHz, 8 Bit, Stereo</MenuItem>
-                                    <MenuItem value="24khz_16bit_stereo">24 kHz, 16 Bit, Stereo</MenuItem>
-                                    <MenuItem value="32khz_8bit_stereo">32 kHz, 8 Bit, Stereo</MenuItem>
-                                    <MenuItem value="32khz_16bit_stereo">32 kHz, 16 Bit, Stereo</MenuItem>
-                                    <MenuItem value="44khz_8bit_stereo">44 kHz, 8 Bit, Stereo</MenuItem>
-                                    <MenuItem value="44khz_16bit_stereo">44 kHz, 16 Bit, Stereo</MenuItem>
-                                    <MenuItem value="48khz_8bit_stereo">48 kHz, 8 Bit, Stereo</MenuItem>
-                                    <MenuItem value="48khz_16bit_stereo">48 kHz, 16 Bit, Stereo</MenuItem>
+                                    <MenuItem value="0">Standard Quality (small size, fast synthesis)</MenuItem>
+                                    <MenuItem value="1">High Quality (large size, slow synthesis)</MenuItem>
                             </Select>
                         </FormControl>
                         <FormControl>
@@ -663,23 +539,23 @@ function App() {
                                 value={speed}
                                 onChange={handleSpeedChange}
                             >
-                                <MenuItem value="-10">⏪ 0.5x</MenuItem>
-                                <MenuItem value="-9">⏪ 0.6x</MenuItem>
-                                <MenuItem value="-8">⏪ 0.7x</MenuItem>
-                                <MenuItem value="-7">⏪ 0.8x</MenuItem>
-                                <MenuItem value="-6">⏪ 0.85x</MenuItem>
-                                <MenuItem value="-5">⏪ 0.9x</MenuItem>
-                                <MenuItem value="-4">⏪ 0.95x</MenuItem>
-                                <MenuItem value="1">1.0x (Default)</MenuItem>
-                                <MenuItem value="2">⏩ 1.05x</MenuItem>
-                                <MenuItem value="3">⏩ 1.1x</MenuItem>
-                                <MenuItem value="4">⏩ 1.15x</MenuItem>
-                                <MenuItem value="5">⏩ 1.2x</MenuItem>
-                                <MenuItem value="6">⏩ 1.25x</MenuItem>
-                                <MenuItem value="7">⏩ 1.3x</MenuItem>
-                                <MenuItem value="8">⏩ 1.4x</MenuItem>
-                                <MenuItem value="9">⏩ 1.5x</MenuItem>
-                                <MenuItem value="10">⏩ 2.0x</MenuItem>
+                                <MenuItem value="0.5">⏪ 0.5x</MenuItem>
+                                <MenuItem value="0.6">⏪ 0.6x</MenuItem>
+                                <MenuItem value="0.7">⏪ 0.7x</MenuItem>
+                                <MenuItem value="0.8">⏪ 0.8x</MenuItem>
+                                <MenuItem value="0.85">⏪ 0.85x</MenuItem>
+                                <MenuItem value="0.9">⏪ 0.9x</MenuItem>
+                                <MenuItem value="0.95">⏪ 0.95x</MenuItem>
+                                <MenuItem value="1.0">1.0x (Default)</MenuItem>
+                                <MenuItem value="1.05">⏩ 1.05x</MenuItem>
+                                <MenuItem value="1.1">⏩ 1.1x</MenuItem>
+                                <MenuItem value="1.15">⏩ 1.15x</MenuItem>
+                                <MenuItem value="1.2">⏩ 1.2x</MenuItem>
+                                <MenuItem value="1.25">⏩ 1.25x</MenuItem>
+                                <MenuItem value="1.3">⏩ 1.3x</MenuItem>
+                                <MenuItem value="1.4">⏩ 1.4x</MenuItem>
+                                <MenuItem value="1.5">⏩ 1.5x</MenuItem>
+                                <MenuItem value="2.0">⏩ 2.0x</MenuItem>
                             </Select>
                         </FormControl>
                         <FormControl>
@@ -707,7 +583,70 @@ function App() {
                                 <MenuItem value="1.8">🔼 180%</MenuItem>
                                 <MenuItem value="2.0">🔼 200%</MenuItem>
                             </Select>
-                        </FormControl>                                        
+                        </FormControl>
+                        <FormControl>
+                            <Typography variant="body1"  style={{
+                                marginBottom: '1rem !important',
+                                fontSize: '.875rem',
+                                color: '#1e2022',
+                                fontWeight: 'bold',
+                                margin: '1em 0 1em',
+                                marginRight: '10px'
+                            }}>🎚️ Pitch Adjustment (Can be used for voice changing effects)</Typography>
+                                <Select
+                                    labelId="userSelectTTSSettingPitch-label"
+                                    id="userSelectTTSSettingPitch"
+                                    value={pitch}
+                                    onChange={handlePitchChange}
+                                >
+                                    <MenuItem value="2.0">🔼 Super High pitch (+100%)</MenuItem>
+                                    <MenuItem value="1.5">🔼 High pitch (+50%)</MenuItem>
+                                    <MenuItem value="1.25">🔼 Medium-high pitch (+25%)</MenuItem>
+                                    <MenuItem value="1.1">🔼 Slightly high pitch (+10%)</MenuItem>
+                                    <MenuItem value="1.05">🔼 Slightly high pitch (+5%)</MenuItem>
+                                    <MenuItem value="1">Default (normal pitch)</MenuItem>
+                                    <MenuItem value="0.95">🔽 Slightly low pitch (-5%)</MenuItem>
+                                    <MenuItem value="0.9">🔽 Slightly low pitch (-10%)</MenuItem>
+                                    <MenuItem value="0.75">🔽 Low pitch (-25%)</MenuItem>
+                                    <MenuItem value="0.5">🔽 Super low pitch (-50%)</MenuItem>
+                                </Select>
+                        </FormControl>
+                        <FormControl>
+                            <Typography variant="body1"  style={{
+                                marginBottom: '1rem !important',
+                                fontSize: '.875rem',
+                                color: '#1e2022',
+                                fontWeight: 'bold',
+                                margin: '1em 0 1em',
+                                marginRight: '10px',                                
+                            }}>🕒 Adjust the pause time of each paragraph (new line)</Typography>
+                                <Select
+                                    labelId="userSelectTTSParagraphPauseTime-label"
+                                    id="userSelectTTSParagraphPauseTime"
+                                    value={pauseTime}
+                                    onChange={handlePauseTimeChange}
+                                >
+                                    <MenuItem value="-1">🕒 0ms (eliminate pauses)</MenuItem>
+                                    <MenuItem value="50">🕒 50ms</MenuItem>
+                                    <MenuItem value="100">🕒 100ms</MenuItem>
+                                    <MenuItem value="200">🕒 200ms</MenuItem>
+                                    <MenuItem value="0">Default (300ms)</MenuItem>
+                                    <MenuItem value="600">🕒 600ms</MenuItem>
+                                    <MenuItem value="800">🕒 800ms</MenuItem>
+                                    <MenuItem value="1000">🕒 1000ms</MenuItem>
+                                    <MenuItem value="1200">🕒 1200ms</MenuItem>
+                                    <MenuItem value="1500">🕒 1500ms</MenuItem>
+                                    <MenuItem value="1800">🕒 1800ms</MenuItem>
+                                    <MenuItem value="2000">🕒 2000ms</MenuItem>
+                                    <MenuItem value="2500">🕒 2500ms</MenuItem>
+                                    <MenuItem value="3000">🕒 3000ms</MenuItem>
+                                    <MenuItem value="4000">🕒 4000ms</MenuItem>
+                                    <MenuItem value="5000">🕒 5000ms</MenuItem>
+                                    <MenuItem value="6000">🕒 6000ms</MenuItem>
+                                    <MenuItem value="8000">🕒 8000ms</MenuItem>
+                                    <MenuItem value="10000">🕒 10000ms</MenuItem>
+                                </Select>
+                        </FormControl>
                         </FormGroup>
                     </Container>
                     </Container>

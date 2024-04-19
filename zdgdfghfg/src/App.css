@@ -1,0 +1,78 @@
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.MuiPopover-paper.custom-select.MuiMenu-paper.MuiPaper-root {
+  opacity: 1;
+  transform: none;
+  min-width: 376px;
+  transition: opacity 412ms cubic-bezier(0.4, 0, 0.2, 1) 0ms, transform 274ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+  top: 190px;
+  left: 992px;
+  transform-origin: 188px 110px;
+}
+
+
+#reload_href {
+  color: red !important ;/* Example color */
+  font-weight: bold !important; /* Example font weight */
+  text-decoration: none; /* Example text decoration */
+}
+
+.dropdown {
+  display: block;
+  width: 100%;
+  padding: .6125rem 1rem;
+  font-size: .875rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #1e2022;
+  background-color: #fff;
+  background-clip: padding-box;
+  border: .0625rem solid rgba(0, 0, 0, .6);
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  border-radius: .3125rem;
+  border-width: 2px !important;
+  margin-top: .5rem !important;
+  padding: 1.5rem !important;
+  background-color: #fbfbfb;
+  transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='48' viewBox='0 0 84 48'%3E%3Cpath d='M0 0h12v6H0V0zm28 8h12v6H28V8zm14-8h12v6H42V0zm14 0h12v6H56V0zm0 8h12v6H56V8zM42 8h12v6H42V8zm0 16h12v6H42v-6zm14-8h12v6H56v-6zm14 0h12v6H70v-6zm0-16h12v6H70V0zM28 32h12v6H28v-6zM14 16h12v6H14v-6zM0 24h12v6H0v-6zm0 8h12v6H0v-6zm14 0h12v6H14v-6zm14 8h12v6H28v-6zm-14 0h12v6H14v-6zm28 0h12v6H42v-6zm14-8h12v6H56v-6zm0-8h12v6H56v-6zm14 8h12v6H70v-6zm0 8h12v6H70v-6zM14 24h12v6H14v-6zm14-8h12v6H28v-6zM14 8h12v6H14V8zM0 8h12v6H0V8z' fill='%23d0d0c4' fill-opacity='0.15' fill-rule='evenodd'/%3E%3C/svg%3E");
+}
